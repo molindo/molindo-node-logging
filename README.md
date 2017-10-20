@@ -6,7 +6,7 @@ A node.js logger that integrates well with the Molindo infrastructure.
  - Pretty prints messages in development mode.
  - Prints JSON messages in production mode.
  - Errors are printed to `stderr`, while all other levels are printed to `stdout`.
- - In development only warnings and errors are printed, while in production all levels are printed.
+ - In development only infos, warnings and errors are printed, while in production all levels are printed.
  - If the process encounters an error, it will log it to the console before shutting down. `unhandledRejection` errors thrown from promises are logged as well.
  - Offers an express integration that logs HTTP requests, including the `operationName` in the case of GraphQL requests. Confidential headers like `cookie` or `authorization` are masked.
  - Uses the levels and level values from [logback](https://logback.qos.ch/): `ERROR` (40000), `WARN` (30000), `INFO` (20000), `DEBUG` (10000), `TRACE` (5000).
