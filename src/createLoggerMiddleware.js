@@ -27,9 +27,13 @@ export default ({logger}) => {
       },
 
       dynamicMeta(req) {
+        const meta = {name: 'express'};
+
         if (req.method === 'POST' && req.body && req.body.operationName) {
-          return {graphql: {operationName: req.body.operationName}};
+          meta.graphql = {operationName: req.body.operationName};
         }
+
+        return meta;
       },
 
       requestFilter(req, propName) {

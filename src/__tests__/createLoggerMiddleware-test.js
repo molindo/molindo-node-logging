@@ -90,6 +90,7 @@ describe('createLoggerMiddleware', () => {
     );
     expect(stdoutCalls[0].level).toBe('DEBUG');
     expect(stdoutCalls[0].level_value).toBe(10000);
+    expect(stdoutCalls[0].logger_name).toBe('express');
     expect(stdoutCalls[0].message).toBe('HTTP GET /');
     expect(stdoutCalls[0].service).toBe('pizza-shop');
 

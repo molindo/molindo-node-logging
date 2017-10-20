@@ -34,11 +34,7 @@ export default class Logger {
     if (!this.service) throw new Error('`service` is mandatory');
 
     this.setupWinston();
-
-    // Create log methods
-    Object.keys(this.levels).forEach(level => {
-      this[level.toLowerCase()] = message => this.winston[level](message);
-    });
+    this.createLogMethods();
   }
 
   receiveOpts(opts) {
@@ -91,6 +87,24 @@ export default class Logger {
     process.on('unhandledRejection', this.onUnhandledException);
   }
 
+  createLogMethods() {
+    Object.keys(this.levels).forEach(level => {
+      this[level.toLowerCase()] = message => {
+        let meta;
+
+        // Log functions can be passed an object to provide
+        // additional meta data like a logger `name`.
+        if (typeof message === 'object') {
+          meta = {...message};
+          delete meta.message;
+          message = message.message;
+        }
+
+        this.winston.log(level, message, meta);
+      };
+    });
+  }
+
   onUnhandledException = e => {
     this.winston[this.getLevelsDescending()[0]](e.stack);
     process.exit(1);
@@ -104,16 +118,18 @@ export default class Logger {
 
   formatJSONMessage(opts) {
     const now = new Date();
+    const {name: logger_name, ...meta} = opts.meta || {};
+    const hasMeta = Object.keys(meta).length > 0;
 
     return JSON.stringify({
       service: this.service,
       '@timestamp': now.toISOString(),
       level: opts.level,
       level_value: this.levels[opts.level],
+      logger_name,
       message: opts.message,
-      meta: opts.meta,
-      stack_trace:
-        opts.meta && opts.meta.stack ? opts.meta.stack.join('\n') : undefined
+      meta: hasMeta ? meta : undefined,
+      stack_trace: hasMeta && meta.stack ? meta.stack.join('\n') : undefined
     });
   }
 

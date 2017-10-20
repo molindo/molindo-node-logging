@@ -77,6 +77,28 @@ describe('Logger', () => {
     logger.destroy();
   });
 
+  it('overloads the log functions to provide a logger name', () => {
+    const logger = new Logger({service: 'pizza-shop', isProduction: true});
+
+    logger.trace({
+      message: 'Making a salami pizza …',
+      name: 'cook'
+    });
+    logger.info({
+      message: 'Pizza can be served now!',
+      name: 'cook'
+    });
+
+    const stdoutCalls = process.stdout.write.mock.calls.map(call =>
+      JSON.parse(call[0])
+    );
+
+    expect(stdoutCalls[0]['logger_name']).toBe('cook');
+    expect(stdoutCalls[1]['logger_name']).toBe('cook');
+
+    logger.destroy();
+  });
+
   it('throws when no service name is provided', () => {
     expect(() => new Logger()).toThrow(/`service` is mandatory/);
   });
