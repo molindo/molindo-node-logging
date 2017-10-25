@@ -1,0 +1,53 @@
+{
+  "name": "molindo-node-logger",
+  "version": "0.0.1",
+  "description": "A node.js logger that integrates well with the Molindo infrastructure.",
+  "main": "lib/index.js",
+  "repository": "https://github.com/molindo/molindo-node-logger.git",
+  "author": "Jan Amann <jam@molindo.at>",
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "logger",
+    "logging",
+    "winston"
+  ],
+  "scripts": {
+    "lint": "eslint src",
+    "test": "jest",
+    "test:watch": "npm run test -- --watch --onlyChanged",
+    "build": "babel src -d lib --ignore __tests__",
+    "prepublish": "npm run lint && npm run test && rimraf ./lib && npm run build"
+  },
+  "files": [
+    "lib"
+  ],
+  "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-eslint": "7.2.3",
+    "babel-jest": "21.2.0",
+    "babel-plugin-transform-class-properties": "6.24.1",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "babel-preset-env": "1.6.1",
+    "eslint": "4.6.1",
+    "eslint-config-molindo": "1.0.0",
+    "eslint-plugin-css-modules": "2.7.5",
+    "eslint-plugin-import": "2.7.0",
+    "eslint-plugin-import-order-autofix": "0.8.3",
+    "eslint-plugin-jsx-a11y": "6.0.2",
+    "eslint-plugin-prettier": "2.2.0",
+    "eslint-plugin-react": "7.3.0",
+    "jest": "21.2.1",
+    "prettier": "1.7.0",
+    "supertest": "3.0.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "express-winston": "^2.4.0",
+    "winston": "^2.4.0"
+  },
+  "engines": {
+    "node": ">= 6.11.0"
+  }
+}
