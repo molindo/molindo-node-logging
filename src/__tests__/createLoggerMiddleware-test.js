@@ -11,7 +11,31 @@ const createServer = logger => {
   server.get('/500', () => {
     throw new Error('500');
   });
-  server.post('/graphql', (req, res) => res.json({data: {publicId: '1'}}));
+  server.post('/graphql', (req, res) => {
+    if (req.body.operationName === 'error') {
+      res.status(500);
+      res.json({
+        data: {
+          errors: [
+            {
+              message: '401: Unauthorized',
+              locations: [{line: 3, column: 3}],
+              path: ['pizzas'],
+              extensions: {
+                statusCode: 401,
+                statusText: 'Unauthorized',
+                responseText: 'Unauthorized',
+                method: 'GET',
+                url: 'https://api.example.com/pizzas'
+              }
+            }
+          ]
+        }
+      });
+    } else {
+      res.json({data: {publicId: '1'}});
+    }
+  });
   return server;
 };
 
@@ -50,20 +74,28 @@ describe('createLoggerMiddleware', () => {
     await supertest(server)
       .post('/graphql')
       .send(mockGraphQLPayload);
+    await supertest(server)
+      .post('/graphql')
+      .send({...mockGraphQLPayload, operationName: 'error'});
     await supertest(server).get('/500');
 
     const stdoutCalls = process.stdout.write.mock.calls.map(call => call[0]);
-    expect(stdoutCalls[0]).toMatch(/DEBUG: HTTP GET \/ statusCode=200, url=\//);
+    expect(stdoutCalls[0]).toMatch(
+      /DEBUG: HTTP GET \/ statusCode=200,.*url=\//
+    );
     expect(stdoutCalls[1]).toMatch(
-      /WARN: HTTP GET \/404 statusCode=404, url=\/404/
+      /WARN: HTTP GET \/404 statusCode=404,[\s\S]*url=\/404/
     );
     expect(stdoutCalls[2]).toMatch(
-      /DEBUG: HTTP POST \/graphql statusCode=200, url=\/graphql/
+      /DEBUG: HTTP POST \/graphql statusCode=200,.*url=\/graphql/
     );
 
     const stderrCalls = process.stderr.write.mock.calls.map(call => call[0]);
     expect(stderrCalls[0]).toMatch(
-      /ERROR: HTTP GET \/500 statusCode=500, url=\/500/
+      /ERROR: HTTP POST \/graphql statusCode=500[\s\S]*url=\/graphql/
+    );
+    expect(stderrCalls[1]).toMatch(
+      /ERROR: HTTP GET \/500 statusCode=500[\s\S]*url=\/500/
     );
 
     logger.destroy();
@@ -78,6 +110,9 @@ describe('createLoggerMiddleware', () => {
     await supertest(server)
       .post('/graphql')
       .send(mockGraphQLPayload);
+    await supertest(server)
+      .post('/graphql')
+      .send({...mockGraphQLPayload, operationName: 'error'});
     await supertest(server).get('/500');
 
     const stdoutCalls = process.stdout.write.mock.calls.map(call =>
@@ -99,6 +134,7 @@ describe('createLoggerMiddleware', () => {
     expect(stdoutCalls[0].meta.req.headers).toBeTruthy();
     expect(stdoutCalls[0].meta.req.method).toBe('GET');
     expect(stdoutCalls[0].meta.req.originalUrl).toBe('/');
+    expect(stdoutCalls[0].meta.req.body).toBe(undefined);
     expect(stdoutCalls[0].meta.res).toBeTruthy();
     expect(stdoutCalls[0].meta.res.statusCode).toBe(200);
     expect(typeof stdoutCalls[0].meta.responseTime).toBe('number');
@@ -106,12 +142,34 @@ describe('createLoggerMiddleware', () => {
     expect(stdoutCalls[1].level).toBe('WARN');
 
     expect(stdoutCalls[2].level).toBe('DEBUG');
-    expect(stdoutCalls[2].meta.graphql).toEqual({operationName: 'createPizza'});
+    expect(stdoutCalls[2].meta.graphql).toEqual({
+      operationName: 'createPizza',
+      variables: {pizza: {toppings: ['salami']}}
+    });
 
     const stderrCalls = process.stderr.write.mock.calls.map(call =>
       JSON.parse(call[0])
     );
     expect(stderrCalls[0].level).toBe('ERROR');
+    expect(stderrCalls[0].meta.res.body).toEqual({
+      data: {
+        errors: [
+          {
+            extensions: {
+              method: 'GET',
+              responseText: 'Unauthorized',
+              statusCode: 401,
+              statusText: 'Unauthorized',
+              url: 'https://api.example.com/pizzas'
+            },
+            locations: [{column: 3, line: 3}],
+            message: '401: Unauthorized',
+            path: ['pizzas']
+          }
+        ]
+      }
+    });
+    expect(stderrCalls[1].level).toBe('ERROR');
 
     logger.destroy();
   });
