@@ -20,13 +20,13 @@ const createServer = logger => {
             {
               message: '401: Unauthorized',
               locations: [{line: 3, column: 3}],
-              path: ['proposals'],
+              path: ['pizzas'],
               extensions: {
                 statusCode: 401,
                 statusText: 'Unauthorized',
                 responseText: 'Unauthorized',
                 method: 'GET',
-                url: 'https://rest.staging.kuechenfinder.work/proposal'
+                url: 'https://api.example.com/pizzas'
               }
             }
           ]
@@ -160,11 +160,11 @@ describe('createLoggerMiddleware', () => {
               responseText: 'Unauthorized',
               statusCode: 401,
               statusText: 'Unauthorized',
-              url: 'https://rest.staging.kuechenfinder.work/proposal'
+              url: 'https://api.example.com/pizzas'
             },
             locations: [{column: 3, line: 3}],
             message: '401: Unauthorized',
-            path: ['proposals']
+            path: ['pizzas']
           }
         ]
       }
