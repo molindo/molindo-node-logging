@@ -2,6 +2,8 @@ import {Router} from 'express';
 import expressWinston from 'express-winston';
 import bodyParser from 'body-parser';
 
+expressWinston.responseWhitelist.push('body');
+
 /**
  * Allows to integrate the logger with an express server.
  */
@@ -30,7 +32,10 @@ export default ({logger}) => {
         const meta = {name: 'express'};
 
         if (req.method === 'POST' && req.body && req.body.operationName) {
-          meta.graphql = {operationName: req.body.operationName};
+          meta.graphql = {
+            operationName: req.body.operationName,
+            variables: req.body.variables
+          };
         }
 
         return meta;
@@ -51,6 +56,24 @@ export default ({logger}) => {
         }
 
         return req[propName];
+      },
+
+      responseFilter(res, propName) {
+        if (propName === 'body') {
+          // Ignore logging the body of responses,
+          // except for if a GraphQL error happened.
+          if (
+            typeof res.body === 'object' &&
+            typeof res.body.data === 'object' &&
+            res.body.data.errors
+          ) {
+            return res[propName];
+          }
+
+          return;
+        }
+
+        return res[propName];
       }
     })
   );
