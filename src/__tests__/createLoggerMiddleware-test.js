@@ -15,22 +15,21 @@ const createServer = logger => {
     if (req.body.operationName === 'error') {
       res.status(500);
       res.json({
-        data: {
-          errors: [
-            {
-              message: '401: Unauthorized',
-              locations: [{line: 3, column: 3}],
-              path: ['pizzas'],
-              extensions: {
-                statusCode: 401,
-                statusText: 'Unauthorized',
-                responseText: 'Unauthorized',
-                method: 'GET',
-                url: 'https://api.example.com/pizzas'
-              }
+        errors: [
+          {
+            message: '401: Unauthorized',
+            locations: [{line: 3, column: 3}],
+            path: ['pizzas'],
+            extensions: {
+              statusCode: 401,
+              statusText: 'Unauthorized',
+              responseText: 'Unauthorized',
+              method: 'GET',
+              url: 'https://api.example.com/pizzas'
             }
-          ]
-        }
+          }
+        ],
+        data: null
       });
     } else {
       res.json({data: {publicId: '1'}});
@@ -152,22 +151,21 @@ describe('createLoggerMiddleware', () => {
     );
     expect(stderrCalls[0].level).toBe('ERROR');
     expect(stderrCalls[0].meta.res.body).toEqual({
-      data: {
-        errors: [
-          {
-            extensions: {
-              method: 'GET',
-              responseText: 'Unauthorized',
-              statusCode: 401,
-              statusText: 'Unauthorized',
-              url: 'https://api.example.com/pizzas'
-            },
-            locations: [{column: 3, line: 3}],
-            message: '401: Unauthorized',
-            path: ['pizzas']
-          }
-        ]
-      }
+      errors: [
+        {
+          extensions: {
+            method: 'GET',
+            responseText: 'Unauthorized',
+            statusCode: 401,
+            statusText: 'Unauthorized',
+            url: 'https://api.example.com/pizzas'
+          },
+          locations: [{column: 3, line: 3}],
+          message: '401: Unauthorized',
+          path: ['pizzas']
+        }
+      ],
+      data: null
     });
     expect(stderrCalls[1].level).toBe('ERROR');
 

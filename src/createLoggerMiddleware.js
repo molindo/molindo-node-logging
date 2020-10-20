@@ -60,13 +60,12 @@ export default ({logger}) => {
 
       responseFilter(res, propName) {
         if (propName === 'body') {
-          // Ignore logging the body of responses,
-          // except for if a GraphQL error happened.
-          if (
-            typeof res.body === 'object' &&
-            typeof res.body.data === 'object' &&
-            res.body.data.errors
-          ) {
+          const hasErrors =
+            res.body && res.body.errors && res.body.errors.length > 0;
+
+          // Ignore logging the body of responses, except for if a GraphQL error
+          // happened.
+          if (hasErrors) {
             return res[propName];
           }
 

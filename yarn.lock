@@ -3761,6 +3761,7 @@ preserve@^0.2.0:
 prettier@1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.7.0.tgz#47481588f41f7c90f63938feb202ac82554e7150"
+  integrity sha512-kIbA3UE9sYGiVCxlWg92EOHWZqte6EAkC7DS5je6NaL8g3Uw1rWe0eH+UX4Hy5OEiR9aql2vVMHeg6lR4YGxYg==
 
 pretty-format@^21.2.1:
   version "21.2.1"
