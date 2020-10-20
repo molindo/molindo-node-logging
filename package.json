@@ -1,6 +1,6 @@
 {
   "name": "molindo-node-logger",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A node.js logger that integrates well with the Molindo infrastructure.",
   "main": "lib/index.js",
   "repository": "https://github.com/molindo/molindo-node-logger.git",
