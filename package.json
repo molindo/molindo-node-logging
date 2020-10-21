@@ -29,7 +29,7 @@
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-preset-env": "1.6.1",
-    "eslint": "4.6.1",
+    "eslint": "4.18.2",
     "eslint-config-molindo": "1.0.0",
     "eslint-plugin-css-modules": "2.7.5",
     "eslint-plugin-import": "2.7.0",
